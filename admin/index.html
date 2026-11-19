@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; connect-src https://wrqjipquwoykblbgsfoy.supabase.co; img-src data:; base-uri 'none'; form-action 'none'">
+<title>HandWarp 檢舉後台</title>
+<style>
+  :root {
+    --bg: #f4f6fb; --card: #ffffff; --ink: #1b2233; --muted: #5d6679; --line: #dfe4ee;
+    --brand: #1040b0; --brand-ink: #ffffff; --soft: #dce6fb; --warn: #b3261e; --warn-soft: #fde8e6;
+    --ok: #2e7d32; --amber: #8a5a00; --amber-soft: #fff1d6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #10131a; --card: #1a1f2b; --ink: #e6e9f2; --muted: #9aa3b5; --line: #2c3343;
+      --brand: #8fb0ff; --brand-ink: #0b1a3d; --soft: #1f2d4f; --warn: #ffb4ab; --warn-soft: #3a1c1a;
+      --ok: #8fd694; --amber: #ffc56b; --amber-soft: #3a2d12;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif; }
+  header { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); background: var(--card); position: sticky; top: 0; z-index: 2; }
+  header h1 { font-size: 18px; margin: 0; flex: 1; }
+  header .who { font-size: 13px; color: var(--muted); text-align: right; }
+  main { max-width: 1080px; margin: 0 auto; padding: 20px 16px 48px; display: grid; gap: 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
+  .card h2 { margin: 0 0 12px; font-size: 18px; }
+  .muted { color: var(--muted); }
+  .small { font-size: 13px; }
+  button { font: inherit; cursor: pointer; border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: var(--ink); padding: 8px 14px; }
+  button.primary { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); font-weight: 700; }
+  button.danger { color: var(--warn); border-color: var(--warn); }
+  button.link { border: none; background: none; color: var(--brand); padding: 4px 0; }
+  button:disabled { opacity: .5; cursor: default; }
+  input[type=text], input[type=email], input[type=password] { font: inherit; width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+  #login { max-width: 420px; margin: 40px auto; display: grid; gap: 12px; }
+  #login h2 { margin: 0 0 4px; font-size: 20px; }
+  #login form { display: grid; gap: 10px; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (max-width: 560px) { .stats { grid-template-columns: 1fr; } }
+  .stat { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+  .stat b { display: block; font-size: 28px; line-height: 1.2; }
+  .list { display: grid; gap: 12px; }
+  .item { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 8px; }
+  .item .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+  .item .nick { font-weight: 700; font-size: 17px; overflow-wrap: anywhere; }
+  .tag { font-size: 12px; font-weight: 700; border-radius: 999px; padding: 1px 9px; border: 1px solid var(--line); }
+  .tag.mask { background: var(--amber-soft); color: var(--amber); border-color: var(--amber); }
+  .tag.hid { background: var(--warn-soft); color: var(--warn); border-color: var(--warn); }
+  .meta { font-size: 14px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 16px; }
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .row input { flex: 1; min-width: 200px; }
+  .status { font-size: 14px; min-height: 1.5em; }
+  .status.err { color: var(--warn); }
+  .status.ok { color: var(--ok); }
+  dialog { border: 1px solid var(--line); border-radius: 16px; background: var(--card); color: var(--ink); max-width: 440px; width: calc(100% - 32px); padding: 20px; }
+  dialog::backdrop { background: rgba(0, 0, 0, .45); }
+  dialog h3 { margin: 0 0 10px; }
+  dialog .btns { justify-content: flex-end; margin-top: 16px; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <h1>HandWarp 檢舉後台</h1>
+  <div class="who"><span id="who"></span><br><button class="link small hidden" id="signout" type="button">登出</button></div>
+</header>
+
+<main>
+  <section id="loading" class="muted">讀取中…</section>
+
+  <section id="login" class="card hidden">
+    <h2>登入</h2>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Email" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+      <input type="password" id="password" placeholder="密碼" autocomplete="current-password" required>
+      <button class="primary" type="submit" id="loginBtn">登入</button>
+    </form>
+    <div id="loginMsg" class="status err"></div>
+  </section>
+
+  <section id="noadmin" class="card hidden">
+    <h2 style="margin-top:0">這個帳號沒有管理權限</h2>
+  </section>
+
+  <section id="admin" class="hidden">
+    <div style="display:grid;gap:20px">
+      <div class="card">
+        <h2>摘要</h2>
+        <div class="stats">
+          <div class="stat"><span class="muted small">待處理檢舉</span><b id="sPending">-</b></div>
+          <div class="stat"><span class="muted small">被檢舉玩家</span><b id="sPlayers">-</b></div>
+          <div class="stat"><span class="muted small">待複查的暱稱遮蔽</span><b id="sMask">-</b></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>待處理的檢舉</h2>
+        <p class="muted small" style="margin-top:0">排序：不同網路數優先。同一個網路換很多帳號灌的檢舉，排不到最上面。</p>
+        <div id="reports" class="list"></div>
+        <div id="reportsMsg" class="status"></div>
+      </div>
+
+      <div class="card">
+        <h2>暱稱被遮住的玩家</h2>
+        <p class="muted small" style="margin-top:0">暱稱被多個不同網路（且玩過遊戲的人）檢舉後，榜上先顯示成 Pilot ####，成績照常。請看過之後選「維持遮蔽」或「解除遮蔽」。</p>
+        <div id="maskedList" class="list"></div>
+      </div>
+
+      <div class="card">
+        <h2>隱藏中的玩家</h2>
+        <div id="hiddenList" class="list"></div>
+      </div>
+
+      <div class="card">
+        <h2>用刪除代碼刪除</h2>
+        <p class="muted small" style="margin-top:0">玩家來信要求刪除資料時，附上 App 設定頁的 12 碼刪除代碼才可以刪（沒有代碼無法確認是本人）。刪除不可復原。</p>
+        <form id="codeForm" class="row">
+          <input type="text" id="code" placeholder="12 碼刪除代碼" maxlength="12" autocomplete="off" autocapitalize="none" spellcheck="false">
+          <button class="danger" type="submit">刪除</button>
+        </form>
+        <div id="codeMsg" class="status"></div>
+      </div>
+      <div class="status" id="globalMsg"></div>
+    </div>
+  </section>
+</main>
+
+<dialog id="confirm">
+  <h3 id="cTitle"></h3>
+  <div id="cBody" class="small"></div>
+  <input type="text" id="cNote" class="hidden" placeholder="備註（選填）" maxlength="200" style="margin-top:10px">
+  <div class="btns"><button id="cNo" type="button">取消</button><button class="primary" id="cYes" type="button">確定</button></div>
+</dialog>
+
+<script src="admin.js"></script>
+</body>
+</html>

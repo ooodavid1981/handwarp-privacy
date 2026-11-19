@@ -21,7 +21,7 @@ footer{margin-top:40px;padding-top:12px;border-top:1px solid var(--line);color:v
 <main>
 <nav><span>HandWarp</span><a href="privacy-zh.html" hreflang="zh-Hant" lang="zh-Hant">中文</a></nav>
 <h1>Privacy Policy</h1>
-<p>Last updated: November 18, 2026 (draft; fill in the real effective date before publishing)</p>
+<p>Last updated: November 19, 2026 (effective: November 19, 2026)</p>
 <p>"HandWarp" (the "App") uses your device's front camera to recognize your hands so you can steer a rocket in the air. No account is needed to play. Camera images are analyzed only on your device in real time; they are not stored and not sent to anyone. A small amount of data is sent to a server only when you view the online (two-hand) leaderboard, upload a two-hand 60-second score, report another player, or delete your leaderboard data.</p>
 <h2>1. Summary</h2>
 <ul>
@@ -52,22 +52,23 @@ footer{margin-top:40px;padding-top:12px;border-top:1px solid var(--line);color:v
 <li>IP address hashes: cleared after 30 days.</li>
 <li>Rejected submissions (the player ID, reason and the submitted values kept when a score fails a plausibility or rate check): deleted automatically after 30 days.</li>
 <li>Reports: deleted automatically after 180 days.</li>
+<li>Data needed for automatic hiding: when a nickname is reported, the system uses the report contents and a salted hash of the network identifier to tell whether several different players reported it, and hides the nickname automatically; the network identifier is kept for at most 30 days and reports for 180 days.</li>
+<li>Report notifications: contain numbers only and are sent to the developer through GitHub; they do not include nicknames, scores or any other content.</li>
 <li>Hide-reason note: while a player is hidden, the note we write about why is stored on that player's data (not public); it is deleted when the player is unhidden or deletes their data.</li>
 <li>Moderation log (hides, unhides, dismissals and deletions we performed: the action, a hash of the player ID, the time, and a note we wrote such as the hide reason or a count): deleted automatically after 180 days.</li>
-<li>Deletion record: left only when a player who is currently hidden or banned deletes their data. It holds a hash of the player ID, the sanction flag, and the times of the sanction and the deletion (to stop a sanctioned player from evading it by deleting and re-registering); no nickname, scores or notes. A player who was not sanctioned leaves no such record. It has no fixed retention period: it is kept until the same player ID submits a score again (the sanction is moved back to that player and the record is deleted) or until we remove it manually. The moderation log above is kept 180 days separately.</li>
-<li>Backups: a daily export of leaderboard data is stored as a temporary file in a private GitHub repository (United States), kept for 14 days then deleted automatically; only the developer can access it.</li>
+<li>Deletion record: left only when a player who is currently hidden, banned or whose nickname is masked deletes their data. It holds a hash of the player ID, the sanction flag, and the times of the sanction (including the nickname mask and its review) and the deletion (to stop a sanctioned player from evading it by deleting and re-registering); no nickname, scores or notes. A player who was not sanctioned leaves no such record. It has no fixed retention period: it is kept until the same player ID submits a score again (the sanction is moved back to that player and the record is deleted) or until we remove it manually. The moderation log above is kept 180 days separately.</li>
 <li>Server provider logs: Supabase's API connection logs temporarily hold the raw IP address for up to 1 day (current plan; if the plan changes we will update this policy first). These logs are controlled by the provider and we look at them only to troubleshoot.</li>
-<li>Location and recipients: database data is stored in Supabase's data center in Tokyo, Japan (ap-northeast-1); backups are stored at GitHub (United States). Both act on our behalf, only on our instructions, and not for any other use. We do not give data to advertisers, data brokers or other third parties.</li>
+<li>Location and recipients: database data is stored in Supabase's data center in Tokyo, Japan (ap-northeast-1); report notifications (numbers only) are sent to the developer through GitHub (United States). Both act on our behalf, only on our instructions, and not for any other use. We do not give data to advertisers, data brokers or other third parties.</li>
 <li>Nickname filter: nicknames are filtered for profanity, URLs and phone numbers; we may change or remove an inappropriate nickname and remove its scores.</li>
 <li>If you do not take part: nothing else in the App is affected.</li>
 </ul>
 <h2>4. Your rights and how to use them</h2>
 <p>You may at any time ask to access, obtain a copy of, correct, stop the collection or use of, or delete your data.</p>
 <ul>
-<li>Deletion: use Settings &gt; Delete my leaderboard data in the App; your nickname, all scores and the reports you sent are deleted immediately. Deleting does not change the random player ID on your phone; reinstalling the App does. If you cannot use the App, email <a href="mailto:mrjc0509@gmail.com">mrjc0509@gmail.com</a> with the deletion code shown on the App's settings page (only you can see it); we will handle it within 30 days after receiving and verifying the request, and can delete your scores, nickname and the reports you sent. Without the deletion code we cannot confirm that you are the person concerned, so we cannot process the request. Either way, daily backups made before the deletion still contain this data until they expire and are deleted automatically (within 14 days).</li>
+<li>Deletion: use Settings &gt; Delete my leaderboard data in the App; your nickname, all scores and the reports you sent are deleted immediately. Deleting does not change the random player ID on your phone; reinstalling the App does. If you cannot use the App, email <a href="mailto:mrjc0509@gmail.com">mrjc0509@gmail.com</a> with the deletion code shown on the App's settings page (only you can see it); we will handle it within 30 days after receiving and verifying the request, and can delete your scores, nickname and the reports you sent. Without the deletion code we cannot confirm that you are the person concerned, so we cannot process the request.</li>
 <li>Other requests: email <a href="mailto:mrjc0509@gmail.com">mrjc0509@gmail.com</a>; there is no charge.</li>
 <li>Please note: we can only find your data by the deletion code. It is lost when you delete the App, so please use the in-app deletion, or note the code, before deleting the App.</li>
-<li>Reporting: if you see an inappropriate nickname or a cheated score, use Leaderboard &gt; tap the player's entry &gt; Report in the App; you can also block that player (blocking is stored only on your phone). We usually review and act within 24 hours.</li>
+<li>Reporting: if you see an inappropriate nickname or a cheated score, use Leaderboard &gt; tap the player's entry &gt; Report in the App; you can also block that player (blocking is stored only on your phone). When a player's nickname is reported within 30 days by at least three players who have played and who are on three different networks, the system automatically hides that player's nickname first (the leaderboard then shows a default name; the score is not affected), and the developer then reviews it manually. The mask applies to the player, not to one nickname, so it stays on after a name change until the developer has reviewed it. When there are pending reports, the developer receives a daily notification. We never remove a player from the leaderboard automatically just because of reports.</li>
 <li>Users in the EU, UK and similar regions also have the right to complain to their local data protection authority. The legal basis for processing is providing the leaderboard service you asked for, and our legitimate interest in preventing abuse.</li>
 </ul>
 <h2>5. Storage and security</h2>
@@ -96,7 +97,9 @@ footer{margin-top:40px;padding-top:12px;border-top:1px solid var(--line);color:v
 <h2>10. Contact us</h2>
 <p>Collector: MRJC</p>
 <p>For any question about this policy, or to use your rights in Section 4, contact: <a href="mailto:mrjc0509@gmail.com">mrjc0509@gmail.com</a></p>
-<footer><a href="privacy-en.html">Privacy Policy</a> <a href="support-en.html">Support</a></footer>
+<h2>11. Terms of Use</h2>
+<p>The rules for using the App and the online leaderboard (including zero tolerance for objectionable content and harassment) are in the <a href="terms-en.html">Terms of Use</a>.</p>
+<footer><a href="privacy-en.html">Privacy Policy</a> <a href="terms-en.html">Terms of Use</a> <a href="support-en.html">Support</a></footer>
 </main>
 </body>
 </html>
